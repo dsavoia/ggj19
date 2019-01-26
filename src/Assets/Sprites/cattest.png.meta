@@ -5,6 +5,9 @@ TextureImporter:
     21300000: cattest_0
     21300002: cattest_1
     21300004: cattest_2
+    21300006: cattest_3
+    21300008: cattest_4
+    21300010: cattest_5
   externalObjects: {}
   serializedVersion: 7
   mipmaps:
@@ -123,7 +126,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 83c0512909b09014894d05e8b544487d
+      spriteID: 866eeb34e1cf7a247b537a2cdfd1e6ef
       vertices: []
       indices: 
       edges: []
@@ -143,13 +146,53 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 952883d4b335eed4897d30999ca58617
+      spriteID: 24a6328c5d3d5244a87752044f94d445
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
       name: cattest_2
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 1024
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 80b74c9d3fd70fa48af79fc35436def6
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cattest_3
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 1024
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 74a5c39bb60861a47816cb0987947860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cattest_4
       rect:
         serializedVersion: 2
         x: 0
@@ -163,7 +206,27 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 65ee4ae3c2e4065428c78224bd6bd2da
+      spriteID: 9b821caf9074466409058fe894e2d8a1
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cattest_5
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 0
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70f8ff48b781ab94eb96dc8b27d87f10
       vertices: []
       indices: 
       edges: []
@@ -171,7 +234,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 03b04f8e7cae67d44986f583623dab8a
+    spriteID: ee1613671f090e845a61d2955c97b7ee
     vertices: []
     indices: 
     edges: []
