@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class Builder : MonoBehaviour
 {
-    public List<Sprite> roofList;
-    public List<Sprite> bodyList;
+    public List<GameObject> roofList;
+    public List<GameObject> bodyList;
     public List<GameObject> doorList;
     public int minUpperDetailsQty = 2, maxUpperDetailsQty = 3;
     public int minBottomDetailsQty = 0, maxBottomDetailsQty = 2;
     public List<GameObject> upperDetailsList;
     public List<GameObject> bottomDetailsList;
     public GameObject buildingPrefab;
+    public float distanceBetweenStructures = 10.0f;
 
     List<GameObject> buildings;
 
@@ -28,7 +29,7 @@ public class Builder : MonoBehaviour
             if(buildings.Count > 0)
             {
                 Vector2 previousBuildingPos = buildings[buildings.Count - 1].transform.position;
-                building.transform.position = new Vector2(previousBuildingPos.x + 2, previousBuildingPos.y);
+                building.transform.position = new Vector2(previousBuildingPos.x + distanceBetweenStructures, previousBuildingPos.y);
             }
             else
             {
@@ -44,10 +45,12 @@ public class Builder : MonoBehaviour
         GameObject building = Instantiate(buildingPrefab) as GameObject;
         Building buildingScript = building.GetComponent<Building>();
 
-        buildingScript.body.GetComponent<SpriteRenderer>().sprite = bodyList[Random.Range(0, bodyList.Count)];
-        buildingScript.roof.GetComponent<SpriteRenderer>().sprite = roofList[Random.Range(0, roofList.Count)];
-        buildingScript.door = Instantiate(doorList[Random.Range(0, doorList.Count)], buildingScript.door.transform.position,
-            Quaternion.identity, buildingScript.door.transform) as GameObject;
+        Instantiate(bodyList[Random.Range(0, bodyList.Count)], buildingScript.body.transform.position,
+            Quaternion.identity, buildingScript.body.transform);
+        Instantiate(roofList[Random.Range(0, roofList.Count)], buildingScript.roof.transform.position,
+            Quaternion.identity, buildingScript.roof.transform);
+        Instantiate(doorList[Random.Range(0, doorList.Count)], buildingScript.door.transform.position,
+            Quaternion.identity, buildingScript.door.transform);
 
         int upperDetailsQty = Random.Range(minUpperDetailsQty, maxUpperDetailsQty + 1);
 
@@ -58,9 +61,9 @@ public class Builder : MonoBehaviour
         }
 
         int bottomDetailsQty = Random.Range(minBottomDetailsQty, maxBottomDetailsQty + 1);
-        
-        List<GameObject> upperDetailsListBucket = upperDetailsList;
-        List<GameObject> bottomDetailsListBucket = bottomDetailsList;
+
+        List<GameObject> upperDetailsListBucket = new List<GameObject>(upperDetailsList);
+        List<GameObject> bottomDetailsListBucket = new List<GameObject>(bottomDetailsList);
 
         for (int i = 0; i < upperDetailsQty; i++)
         {
@@ -73,9 +76,10 @@ public class Builder : MonoBehaviour
                 randomDetailIndex = Random.Range(0, upperDetailsListBucket.Count);
                 randomPositionIndex = Random.Range(0, buildingScript.upperDetails.Count);
 
-                if (!buildingScript.upperDetails[randomPositionIndex])
+                if (buildingScript.upperDetails[randomPositionIndex].transform.childCount == 0)
                 {
-                    buildingScript.upperDetails[randomPositionIndex] = upperDetailsListBucket[randomDetailIndex];
+                    Instantiate(upperDetailsListBucket[randomDetailIndex], buildingScript.upperDetails[randomPositionIndex].transform.position, 
+                        Quaternion.identity, buildingScript.upperDetails[randomPositionIndex].transform);
                     upperDetailsListBucket.RemoveAt(randomDetailIndex);
                     placed = true;
                 }
@@ -93,9 +97,10 @@ public class Builder : MonoBehaviour
                 randomDetailIndex = Random.Range(0, bottomDetailsListBucket.Count);
                 randomPositionIndex = Random.Range(0, buildingScript.bottomDetails.Count);
 
-                if (!buildingScript.bottomDetails[randomPositionIndex])
-                {
-                    buildingScript.bottomDetails[randomPositionIndex] = bottomDetailsListBucket[randomDetailIndex];
+                if (buildingScript.bottomDetails[randomPositionIndex].transform.childCount == 0)
+                {                    
+                    Instantiate(bottomDetailsListBucket[randomDetailIndex], buildingScript.bottomDetails[randomPositionIndex].transform.position,
+                        Quaternion.identity, buildingScript.bottomDetails[randomPositionIndex].transform);
                     bottomDetailsListBucket.RemoveAt(randomDetailIndex);
                     placed = true;
                 }
