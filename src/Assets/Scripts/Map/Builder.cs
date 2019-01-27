@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Builder : MonoBehaviour
@@ -15,11 +16,24 @@ public class Builder : MonoBehaviour
     public List<GameObject> intersectionList;
     public List<GameObject> upperDetailsList;
     public List<GameObject> bottomDetailsList;
-    public GameObject buildingPrefab;    
+    public GameObject buildingPrefab;
+
+    public GameObject catHouse;
+    public Building catHouseScript;
+    public Vector3 catHousePos;
 
     public GameObject[,][] BuildNeighbourhood()
     {
         GameObject[,][] neighbourhood = new GameObject[streetQty, blocksPerStreet][];
+
+        int randStreet = Random.Range(3, streetQty + 1);
+        int randBlock = Random.Range(1, blocksPerStreet + 1);
+        int randStructure = Random.Range(2, minStructuresPerBlock + 1);
+
+        catHousePos = new Vector3(randStreet, randBlock, randStructure);
+        catHouse = null;
+        catHouse = BuildStructure();
+        catHouseScript = catHouse.GetComponent<Building>();
 
         for (int i = 0; i < neighbourhood.GetLength(0); i++)
         {
@@ -43,10 +57,12 @@ public class Builder : MonoBehaviour
             streetParent = new GameObject("StreetParent" + i);
             streetParent.transform.parent = GameManager.Instance.neighbourhoodParent.transform;
             pos = Vector2.zero;
+
             for (int j = 0; j < neighbourhood.GetLength(1); j++)
             {
                 blockParent = new GameObject("BlockParent" + j);
                 blockParent.transform.parent = streetParent.transform;
+
                 for (int k = 0; k < neighbourhood[i, j].GetLength(0); k++)
                 {
                     neighbourhood[i, j][k].transform.position = new Vector2(pos.x + (k * distanceBetweenStructures), pos.y);
@@ -157,6 +173,7 @@ public class Builder : MonoBehaviour
 
     GameObject BuildStructure()
     {
+         
         GameObject building = Instantiate(buildingPrefab) as GameObject;
         Building buildingScript = building.GetComponent<Building>();
 
@@ -166,61 +183,81 @@ public class Builder : MonoBehaviour
             Quaternion.identity, buildingScript.roof.transform);
         Instantiate(doorList[Random.Range(0, doorList.Count)], buildingScript.door.transform.position,
             Quaternion.identity, buildingScript.door.transform);
+        
+        int upperDetailsQty = 0;
+        int bottomDetailsQty = 0;
 
-        int upperDetailsQty = Random.Range(minUpperDetailsQty, maxUpperDetailsQty + 1);
-
-        //Making sure that there is at least 3 details
-        if(upperDetailsQty + maxBottomDetailsQty < 3)
+        do
         {
-            minBottomDetailsQty = 1;
-        }
+            upperDetailsQty = Random.Range(minUpperDetailsQty, maxUpperDetailsQty + 1);
+            bottomDetailsQty = Random.Range(minBottomDetailsQty, maxBottomDetailsQty + 1);
+        } while ((upperDetailsQty + bottomDetailsQty) < 3);
 
-        int bottomDetailsQty = Random.Range(minBottomDetailsQty, maxBottomDetailsQty + 1);
+        bool differentFromCatHouse;
 
-        List<GameObject> upperDetailsListBucket = new List<GameObject>(upperDetailsList);
-        List<GameObject> bottomDetailsListBucket = new List<GameObject>(bottomDetailsList);
-
-        for (int i = 0; i < upperDetailsQty; i++)
+        do
         {
-            int randomDetailIndex;
-            int randomPositionIndex;
-            bool placed = false;
+            differentFromCatHouse = true;
+            //bool results =  query2.All(i=>query1.Contains(i));
 
-            do
+            List<GameObject> upperDetailsListBucket = new List<GameObject>(upperDetailsList);
+            List<GameObject> bottomDetailsListBucket = new List<GameObject>(bottomDetailsList);
+            buildingScript.detailsCodeList = new List<int>();
+
+            for (int i = 0; i < upperDetailsQty; i++)
             {
-                randomDetailIndex = Random.Range(0, upperDetailsListBucket.Count);
-                randomPositionIndex = Random.Range(0, buildingScript.upperDetails.Count);
+                int randomDetailIndex;
+                int randomPositionIndex;
+                bool placed = false;
 
-                if (buildingScript.upperDetails[randomPositionIndex].transform.childCount == 0)
+                do
                 {
-                    Instantiate(upperDetailsListBucket[randomDetailIndex], buildingScript.upperDetails[randomPositionIndex].transform.position, 
-                        Quaternion.identity, buildingScript.upperDetails[randomPositionIndex].transform);
-                    upperDetailsListBucket.RemoveAt(randomDetailIndex);
-                    placed = true;
-                }
-            } while (!placed);
-        }
+                    randomDetailIndex = Random.Range(0, upperDetailsListBucket.Count);
+                    randomPositionIndex = Random.Range(0, buildingScript.upperDetails.Count);
 
-        for (int i = 0; i < bottomDetailsQty; i++)
-        {
-            int randomDetailIndex;
-            bool placed = false;
-            int randomPositionIndex;
+                    if (buildingScript.upperDetails[randomPositionIndex].transform.childCount == 0)
+                    {
+                        GameObject detail = Instantiate(upperDetailsListBucket[randomDetailIndex], buildingScript.upperDetails[randomPositionIndex].transform.position,
+                            Quaternion.identity, buildingScript.upperDetails[randomPositionIndex].transform) as GameObject;
+                        placed = true;
+                        upperDetailsListBucket.RemoveAt(randomDetailIndex);
+                        buildingScript.detailsCodeList.Add(detail.GetComponent<Details>().code);
+                    }
+                } while (!placed);
+            }
 
-            do
+            for (int i = 0; i < bottomDetailsQty; i++)
             {
-                randomDetailIndex = Random.Range(0, bottomDetailsListBucket.Count);
-                randomPositionIndex = Random.Range(0, buildingScript.bottomDetails.Count);
+                int randomDetailIndex;
+                bool placed = false;
+                int randomPositionIndex;
 
-                if (buildingScript.bottomDetails[randomPositionIndex].transform.childCount == 0)
-                {                    
-                    Instantiate(bottomDetailsListBucket[randomDetailIndex], buildingScript.bottomDetails[randomPositionIndex].transform.position,
-                        Quaternion.identity, buildingScript.bottomDetails[randomPositionIndex].transform);
-                    bottomDetailsListBucket.RemoveAt(randomDetailIndex);
-                    placed = true;
+                do
+                {
+                    randomDetailIndex = Random.Range(0, bottomDetailsListBucket.Count);
+                    randomPositionIndex = Random.Range(0, buildingScript.bottomDetails.Count);
+
+                    if (buildingScript.bottomDetails[randomPositionIndex].transform.childCount == 0)
+                    {
+                        GameObject detail = Instantiate(bottomDetailsListBucket[randomDetailIndex], buildingScript.bottomDetails[randomPositionIndex].transform.position,
+                            Quaternion.identity, buildingScript.bottomDetails[randomPositionIndex].transform) as GameObject;
+                        bottomDetailsListBucket.RemoveAt(randomDetailIndex);
+                        placed = true;
+                        buildingScript.detailsCodeList.Add(detail.GetComponent<Details>().code);
+                    }
+                } while (!placed);
+            }
+
+            if (catHouseScript)
+            {
+                if (catHouseScript.detailsCodeList.All(i => buildingScript.detailsCodeList.Contains(i)))
+                {
+                    print("cat: " + catHouseScript.detailsCodeList + " || created: " + buildingScript.detailsCodeList);
+                    differentFromCatHouse = false;
                 }
-            } while (!placed);
-        }
+            }
+
+        } while (!differentFromCatHouse);
 
         return building;
     }

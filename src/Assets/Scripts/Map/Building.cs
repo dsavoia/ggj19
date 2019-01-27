@@ -10,4 +10,5 @@ public class Building : MonoBehaviour
     public List<GameObject> upperDetails;
     public List<GameObject> bottomDetails;
 
+    public List<int> detailsCodeList;
 }
