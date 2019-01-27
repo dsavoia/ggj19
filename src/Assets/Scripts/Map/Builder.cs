@@ -15,48 +15,9 @@ public class Builder : MonoBehaviour
     public List<GameObject> intersectionList;
     public List<GameObject> upperDetailsList;
     public List<GameObject> bottomDetailsList;
-    public GameObject buildingPrefab;
+    public GameObject buildingPrefab;    
 
-    GameObject[,][] neighbourhood;
-
-    void Start()
-    {
-        neighbourhood = BuildNeighbourhood();
-        Vector2 pos;
-
-        GameObject neighbourhoodParent = new GameObject("NeighbourhoodParent");
-        GameObject streetParent;
-        GameObject blockParent;
-
-        for (int i = 0; i < neighbourhood.GetLength(0); i++)
-        {
-            streetParent = new GameObject("StreetParent" + i);
-            streetParent.transform.parent = neighbourhoodParent.transform;
-            pos = Vector2.zero;
-            for (int j = 0; j < neighbourhood.GetLength(1); j++)
-            {
-                blockParent = new GameObject("BlockParent" + j);
-                blockParent.transform.parent = streetParent.transform;
-                for (int k = 0; k < neighbourhood[i,j].GetLength(0); k++)
-                {
-                    neighbourhood[i,j][k].transform.position = new Vector2(pos.x + (k * distanceBetweenStructures), pos.y);
-                    neighbourhood[i,j][k].transform.parent = blockParent.transform;
-                }
-
-                blockParent.SetActive(false);
-            }                        
-        }
-
-        AssignNeighbours();
-        neighbourhoodParent.transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(true);
-    }
-
-    void Update()
-    {
-        
-    }
-
-    GameObject[,][] BuildNeighbourhood()
+    public GameObject[,][] BuildNeighbourhood()
     {
         GameObject[,][] neighbourhood = new GameObject[streetQty, blocksPerStreet][];
 
@@ -71,6 +32,33 @@ public class Builder : MonoBehaviour
                 neighbourhood[i, j] = BuildStreetBlock(i, j);
             }
         }
+
+        Vector2 pos;
+        
+        GameObject streetParent;
+        GameObject blockParent;
+
+        for (int i = 0; i < neighbourhood.GetLength(0); i++)
+        {
+            streetParent = new GameObject("StreetParent" + i);
+            streetParent.transform.parent = GameManager.Instance.neighbourhoodParent.transform;
+            pos = Vector2.zero;
+            for (int j = 0; j < neighbourhood.GetLength(1); j++)
+            {
+                blockParent = new GameObject("BlockParent" + j);
+                blockParent.transform.parent = streetParent.transform;
+                for (int k = 0; k < neighbourhood[i, j].GetLength(0); k++)
+                {
+                    neighbourhood[i, j][k].transform.position = new Vector2(pos.x + (k * distanceBetweenStructures), pos.y);
+                    neighbourhood[i, j][k].transform.parent = blockParent.transform;
+                }
+
+                blockParent.SetActive(false);
+            }
+        }
+
+        AssignNeighbours(neighbourhood);
+        GameManager.Instance.neighbourhoodParent.transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(true);
 
         return neighbourhood;
     }
@@ -94,7 +82,7 @@ public class Builder : MonoBehaviour
         return streetBlock;
     }
 
-    public void AssignNeighbours()
+    void AssignNeighbours(GameObject[,][] neighbourhood)
     {
         Vector2 left, right, up, down;
 
@@ -138,7 +126,7 @@ public class Builder : MonoBehaviour
                     yPos = j - 1;
                 }
 
-                down = new Vector2(j, yPos);
+                down = new Vector2(i, yPos);
 
                 //Up
                 if (j == neighbourhood.GetLength(1) - 1)
@@ -167,7 +155,7 @@ public class Builder : MonoBehaviour
         }
     }
 
-    public GameObject BuildStructure()
+    GameObject BuildStructure()
     {
         GameObject building = Instantiate(buildingPrefab) as GameObject;
         Building buildingScript = building.GetComponent<Building>();

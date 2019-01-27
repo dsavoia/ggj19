@@ -33,8 +33,8 @@ public class Player : MonoBehaviour
 
     public Controller2D controller;
 
-    Intersection currentIntersection;
-    bool goToSideBlock = false;
+    public Intersection currentIntersection;
+    public bool goToSideBlock = false;
 
     Vector2 directionalInput;
 
@@ -44,7 +44,6 @@ public class Player : MonoBehaviour
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
         maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
         minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
-        //print("Gravity: " + gravity + "   Jump Velocity: " + maxJumpVelocity);
     }
 
     void Update()
@@ -62,24 +61,24 @@ public class Player : MonoBehaviour
         if(directionalInput.y != 0 && currentIntersection)
         {
             if(directionalInput.y > 0)
-            {
-                print("Subiríamos para: " + currentIntersection.upBlock);                
+            {                
+                GameManager.Instance.NextBlock(currentIntersection.upBlock, currentIntersection.right, false);
             }
             else
-            {
-                print("Desceríamos para: " + currentIntersection.downBlock);
+            {                
+                GameManager.Instance.NextBlock(currentIntersection.downBlock, currentIntersection.right, false);
             }
         }
 
         if (directionalInput.x != 0 && goToSideBlock)
         {
             if (currentIntersection.right)
-            {
-                print("Direta para: " + currentIntersection.sideBlock);
+            {                
+                GameManager.Instance.NextBlock(currentIntersection.sideBlock, currentIntersection.right, true);
             }
             else
-            {
-                print("Esquerda para: " + currentIntersection.sideBlock);
+            {                
+                GameManager.Instance.NextBlock(currentIntersection.sideBlock, currentIntersection.right, true);
             }
         }
     }
@@ -172,23 +171,18 @@ public class Player : MonoBehaviour
         if(collision.tag == "intersection")
         {
             currentIntersection = collision.GetComponentInParent<Intersection>();
-            print("name:" + collision.name);
-            print("tag:" + collision.tag);
         }
 
         if (collision.tag == "nextBlock")
         {
             currentIntersection = collision.GetComponentInParent<Intersection>();
-            print("name:" + collision.name);
-            print("tag:" + collision.tag);
             goToSideBlock = true;
-            print(collision.name);
         }
     }
 
     void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.tag == "intersection")
+        if (collision.tag == "intersection" && !goToSideBlock)
         {
             currentIntersection = null;
         }
