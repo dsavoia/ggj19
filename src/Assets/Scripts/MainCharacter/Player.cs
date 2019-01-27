@@ -33,6 +33,9 @@ public class Player : MonoBehaviour
 
     public Controller2D controller;
 
+    Intersection currentIntersection;
+    bool goToSideBlock = false;
+
     Vector2 directionalInput;
 
     void Start()
@@ -54,6 +57,30 @@ public class Player : MonoBehaviour
         if (controller.collisions.above || controller.collisions.below)
         {
             velocity.y = 0;
+        }
+
+        if(directionalInput.y != 0 && currentIntersection)
+        {
+            if(directionalInput.y > 0)
+            {
+                print("Subiríamos para: " + currentIntersection.upBlock);                
+            }
+            else
+            {
+                print("Desceríamos para: " + currentIntersection.downBlock);
+            }
+        }
+
+        if (directionalInput.x != 0 && goToSideBlock)
+        {
+            if (currentIntersection.right)
+            {
+                print("Direta para: " + currentIntersection.sideBlock);
+            }
+            else
+            {
+                print("Esquerda para: " + currentIntersection.sideBlock);
+            }
         }
     }
 
@@ -138,5 +165,38 @@ public class Player : MonoBehaviour
                 timeToWallUnstick = wallStickTime;
             }
         }
-    }    
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.tag == "intersection")
+        {
+            currentIntersection = collision.GetComponentInParent<Intersection>();
+            print("name:" + collision.name);
+            print("tag:" + collision.tag);
+        }
+
+        if (collision.tag == "nextBlock")
+        {
+            currentIntersection = collision.GetComponentInParent<Intersection>();
+            print("name:" + collision.name);
+            print("tag:" + collision.tag);
+            goToSideBlock = true;
+            print(collision.name);
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.tag == "intersection")
+        {
+            currentIntersection = null;
+        }
+
+        if (collision.tag == "nextBlock")
+        {
+            currentIntersection = null;
+            goToSideBlock = false;
+        }
+    }
 }

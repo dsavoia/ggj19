@@ -27,20 +27,5 @@ public class PlayerInput : MonoBehaviour {
         {
             player.OnJumpInputUp();
         }
-
-        if (Input.GetKeyUp(KeyCode.UpArrow))
-        {
-            //@TODO: up arrow input
-        }
-
-        if (Input.GetKeyUp(KeyCode.DownArrow))
-        {
-            //@TODO: down arrow input
-        }
-
-        if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            //@TODO: LeftShift input
-        }
     }
 }

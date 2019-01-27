@@ -4,39 +4,166 @@ using UnityEngine;
 
 public class Builder : MonoBehaviour
 {
+    public int minUpperDetailsQty = 2, maxUpperDetailsQty = 3;
+    public int minBottomDetailsQty = 0, maxBottomDetailsQty = 2;
+    public int minStructuresPerBlock = 6, maxStructuresPerBlock = 8;
+    public int streetQty = 5, blocksPerStreet = 5;
+    public float distanceBetweenStructures = 13.0f;
     public List<GameObject> roofList;
     public List<GameObject> bodyList;
     public List<GameObject> doorList;
-    public int minUpperDetailsQty = 2, maxUpperDetailsQty = 3;
-    public int minBottomDetailsQty = 0, maxBottomDetailsQty = 2;
+    public List<GameObject> intersectionList;
     public List<GameObject> upperDetailsList;
     public List<GameObject> bottomDetailsList;
     public GameObject buildingPrefab;
-    public float distanceBetweenStructures = 10.0f;
 
-    List<GameObject> buildings;
+    GameObject[,][] neighbourhood;
 
     void Start()
     {
-        buildings = new List<GameObject>();    
+        neighbourhood = BuildNeighbourhood();
+        Vector2 pos;
+
+        GameObject neighbourhoodParent = new GameObject("NeighbourhoodParent");
+        GameObject streetParent;
+        GameObject blockParent;
+
+        for (int i = 0; i < neighbourhood.GetLength(0); i++)
+        {
+            streetParent = new GameObject("StreetParent" + i);
+            streetParent.transform.parent = neighbourhoodParent.transform;
+            pos = Vector2.zero;
+            for (int j = 0; j < neighbourhood.GetLength(1); j++)
+            {
+                blockParent = new GameObject("BlockParent" + j);
+                blockParent.transform.parent = streetParent.transform;
+                for (int k = 0; k < neighbourhood[i,j].GetLength(0); k++)
+                {
+                    neighbourhood[i,j][k].transform.position = new Vector2(pos.x + (k * distanceBetweenStructures), pos.y);
+                    neighbourhood[i,j][k].transform.parent = blockParent.transform;
+                }
+
+                blockParent.SetActive(false);
+            }                        
+        }
+
+        AssignNeighbours();
+        neighbourhoodParent.transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(true);
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            GameObject building = BuildStructure();
-            if(buildings.Count > 0)
-            {
-                Vector2 previousBuildingPos = buildings[buildings.Count - 1].transform.position;
-                building.transform.position = new Vector2(previousBuildingPos.x + distanceBetweenStructures, previousBuildingPos.y);
-            }
-            else
-            {
-                building.transform.position = Vector3.zero;
-            }
+        
+    }
 
-            buildings.Add(building);
+    GameObject[,][] BuildNeighbourhood()
+    {
+        GameObject[,][] neighbourhood = new GameObject[streetQty, blocksPerStreet][];
+
+        for (int i = 0; i < neighbourhood.GetLength(0); i++)
+        {
+            for (int j = 0; j < neighbourhood.GetLength(1); j++)
+            {
+                int structureQty = Random.Range(minStructuresPerBlock, maxStructuresPerBlock + 1);
+                //Adding space to intersections
+                structureQty += 2;
+                neighbourhood[i, j] = new GameObject[structureQty];
+                neighbourhood[i, j] = BuildStreetBlock(i, j);
+            }
+        }
+
+        return neighbourhood;
+    }
+
+    GameObject[] BuildStreetBlock(int blockX, int blockY)
+    {
+        int structureQty = Random.Range(minStructuresPerBlock, maxStructuresPerBlock + 1);
+        //Adding space to intersections
+        structureQty += 2;
+        GameObject[] streetBlock = new GameObject[structureQty];
+        
+        for (int i = 1; i < structureQty-1; i++)
+        {
+            streetBlock[i] = BuildStructure();
+        }
+
+        streetBlock[0] = Instantiate(intersectionList[Random.Range(0, intersectionList.Count)]) as GameObject;
+        streetBlock[0].transform.localScale *= -1;
+        streetBlock[structureQty-1] = Instantiate(intersectionList[Random.Range(0, intersectionList.Count)]) as GameObject;           
+
+        return streetBlock;
+    }
+
+    public void AssignNeighbours()
+    {
+        Vector2 left, right, up, down;
+
+        int xPos, yPos;
+
+        for (int i = 0; i < neighbourhood.GetLength(0); i++)
+        {
+            for (int j = 0; j < neighbourhood.GetLength(1); j++)
+            {                
+                //Left
+                if (i == 0)
+                {
+                    xPos = neighbourhood.GetLength(0) - 1;
+                }
+                else
+                {
+                    xPos = i - 1;
+                }
+
+                left = new Vector2(xPos, j);
+
+                //Right
+                if (i == neighbourhood.GetLength(0) - 1)
+                {
+                    xPos = 0;
+                }
+                else
+                {
+                    xPos = i + 1;
+                }
+
+                right = new Vector2(xPos, j);
+
+                //Down
+                if (j == 0)
+                {
+                    yPos = neighbourhood.GetLength(1) - 1;
+                }
+                else
+                {
+                    yPos = j - 1;
+                }
+
+                down = new Vector2(j, yPos);
+
+                //Up
+                if (j == neighbourhood.GetLength(1) - 1)
+                {
+                    yPos = 0;
+                }
+                else
+                {
+                    yPos = j + 1;
+                }
+
+                up = new Vector2(i, yPos);
+
+                Intersection intersectionScript = neighbourhood[i,j][0].GetComponent<Intersection>();
+                intersectionScript.sideBlock = left;
+                intersectionScript.upBlock = up;
+                intersectionScript.downBlock = down;
+                intersectionScript.right = false;
+
+                intersectionScript = neighbourhood[i, j][neighbourhood[i, j].GetLength(0)- 1].GetComponent<Intersection>();
+                intersectionScript.sideBlock = right;
+                intersectionScript.upBlock = up;
+                intersectionScript.downBlock = down;
+                intersectionScript.right = true;                
+            }
         }
     }
 
