@@ -189,6 +189,7 @@ public class Builder : MonoBehaviour
 
         do
         {
+            Debug.Log("0");
             upperDetailsQty = Random.Range(minUpperDetailsQty, maxUpperDetailsQty + 1);
             bottomDetailsQty = Random.Range(minBottomDetailsQty, maxBottomDetailsQty + 1);
         } while ((upperDetailsQty + bottomDetailsQty) < 3);
@@ -197,6 +198,7 @@ public class Builder : MonoBehaviour
 
         do
         {
+            Debug.Log("1");
             differentFromCatHouse = true;
             //bool results =  query2.All(i=>query1.Contains(i));
 
@@ -212,6 +214,7 @@ public class Builder : MonoBehaviour
 
                 do
                 {
+                    Debug.Log("2");
                     randomDetailIndex = Random.Range(0, upperDetailsListBucket.Count);
                     randomPositionIndex = Random.Range(0, buildingScript.upperDetails.Count);
 
@@ -234,6 +237,7 @@ public class Builder : MonoBehaviour
 
                 do
                 {
+                    Debug.Log("3");
                     randomDetailIndex = Random.Range(0, bottomDetailsListBucket.Count);
                     randomPositionIndex = Random.Range(0, buildingScript.bottomDetails.Count);
 
@@ -252,12 +256,14 @@ public class Builder : MonoBehaviour
             {
                 if (catHouseScript.detailsCodeList.All(i => buildingScript.detailsCodeList.Contains(i)))
                 {
-                    print("cat: " + catHouseScript.detailsCodeList + " || created: " + buildingScript.detailsCodeList);
+                    //Debug.Log("cat: " + catHouseScript.detailsCodeList + " || created: " + buildingScript.detailsCodeList);
                     differentFromCatHouse = false;
                 }
+                //Debug.Log("catHouse: " + catHouseScript.detailsCodeList.ConvertAll(i => i.ToString()).ToArray() + 
+                //" | buildingScript: " + buildingScript.detailsCodeList.ConvertAll(i => i.ToString()).ToArray()); 
             }
 
-        } while (!differentFromCatHouse);
+        } while (!differentFromCatHouse);        
 
         return building;
     }
