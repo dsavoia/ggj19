@@ -1,2 +1,2 @@
 # ggj19
-Repo for the Global Game Jam 2019
+Repo for the Global Game Jam 2019 - Unfinished game
